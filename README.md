@@ -26,16 +26,16 @@ $ python3 ./<SCRIPT>
 Notable libraries used:
 - Subprocess
 
-Used to spawn SSH processes, redirect standard output to variables and redirect standard in to a pseudo-terminals. 
+Used to spawn SSH processes, redirect standard out to variables and redirect standard in to pseudo-terminals. 
 - Pty
 
-Used to spawn pseudo-terminals as to allow the subprocess standard in to be written to.
+Used to spawn pseudo-terminals as to allow subprocess standard in to be written to.
 - Threading
 
-Used to spawn processes on seperate threads as deamons, limit the number of threads active at a time with 'Semaphore' and temporarily lock data sets to prevent Race Conditions with 'Lock'.
+Used to spawn processes on seperate threads as deamons, limit the number of threads active at a time with 'Semaphore' and temporarily lock data sets to prevent race conditions with 'Lock'.
 - Queue
 
-Used to enable queueing of tasks in a thread safe manner.
+Used to enable thread safe queueing of tasks.
 
 ## Maintainers
 [@Tekore](https://github.com/tekore)

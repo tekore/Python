@@ -25,10 +25,13 @@ $ python3 ./<SCRIPT>
 ### Nagios-automation.py
 Notable libraries used:
 - subprocess
-
+Used to spawn SSH processes, redirect standard output to variables and redirect standard in to a pseudo-terminals. 
 - pty
-
+Used to spawn pseudo-terminals as to allow the subprocess standard in to be written to.
 - threading
+Used to spawn processes on seperate threads as deamons, limit the number of threads active at a time with 'Semaphore' and temporarily lock data sets to prevent Race Conditions with 'Lock'.
+- queue
+Used to enable queueing of tasks in a thread safe manner.
 
 ## Maintainers
 [@Tekore](https://github.com/tekore)

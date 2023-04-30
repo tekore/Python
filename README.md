@@ -5,7 +5,6 @@
 Various Python automation scripts
 
 ## Table of Contents
-- [Install](#install)
 - [Usage](#usage)
 - [Showcase](#showcase)
 - [Maintainers](#maintainers)

@@ -2,10 +2,6 @@ import os,sys,re,subprocess,pty,getpass,time,argparse,json,threading,select
 from queue import Queue
 from subprocess import DEVNULL
 
-#################################
-#   Last updated - 28/04/2023   #
-#################################
-
 class Prerun:
     def __init__(self, monitoring_user, monitoring_secret, fixable_alerts):
         self.monitoring_user = monitoring_user

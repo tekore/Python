@@ -116,7 +116,7 @@ class Store:
                     self.pin.write(password + "\n")
                     time.sleep(1)
                     self.pin.write("whoami\n")
-                if re.search(r"^root@", line):
+                if re.search(r"root@", line):
                     return(process)
         raise RuntimeError("Sudo Timeout for store: %s" %(self.store))
 

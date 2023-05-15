@@ -9,6 +9,7 @@ def get_value(key, string):
 
 with open('/proc/meminfo') as memory:
     memory_data = memory.read()
+
 #Total Memory:
 total_memory = get_value('MemTotal', memory_data)
 total_memory = float(total_memory.replace(' kB', "")) * 10**-6

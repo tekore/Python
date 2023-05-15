@@ -35,6 +35,15 @@ Used to spawn processes on seperate threads as deamons, limit the number of thre
 - Queue
 
 Used to enable thread safe queueing of tasks.
+### ssh.py
+Cluster SSH created in python3
+Notable libraries used:
+- Subprocess
+- Pty
+- Threading
+- Queue
+- Improvments
+Use the multiprocessing library alongside the threading library to take advantage of multicore systems
 
 ## Maintainers
 [@Tekore](https://github.com/tekore)

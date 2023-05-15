@@ -45,7 +45,8 @@ Notable libraries used:
 - Queue
 
 Future Improvments:
-Use the multiprocessing library alongside the threading library to take advantage of multicore systems
+
+- Use the multiprocessing library alongside the threading library to take advantage of multicore systems
 
 ## Maintainers
 [@Tekore](https://github.com/tekore)

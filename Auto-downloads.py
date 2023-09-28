@@ -1,35 +1,33 @@
-import os,sys,socket,requests,argparse,getpass
+import os,sys,socket,requests,argparse,getpass,time,shutil
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pathlib import Path
 
 # Notes:
 # - Precheck run, check the directory is writable, ufw is installed (precheck def)
-# - Download the VYOS image from the webpage (no api but there is a weblink)
 # - RHEL api, download the correct image (Poll and wait for the build to be ready)
 
-def vyos_download():
-    url = 'https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova'
+def download(file_name, url):
     filename = os.path.basename(url)
-    dl_path = os.path.expanduser('~') + "/vyos"
+    dl_path = os.path.expanduser('./') + "/downloads/"
     os.makedirs(dl_path, exist_ok=True)
     abs_path = os.path.join(dl_path, filename)
-    print("Downloading the Vyos image to %s" %(abs_path))
-    with requests.get(url) as r, open(abs_path, "wb") as f:
-        f.write(r.content)
+    print("Downloading %s to: %s" %(file_name, abs_path))
+    with requests.get(url, stream=True) as r:
+        with open(abs_path, 'wb') as file:
+            total_size, chunk_size = int(r.headers.get('Content-Length')), 10240000
+            for i, chunk in enumerate(r.iter_content(chunk_size=chunk_size)):
+                c = i * chunk_size / total_size * 100
+                file.write(chunk)
+                sys.stdout.write(f"\rDownloading {file_name} {round(c, 4)}%")
+                time.sleep(.1)
+                sys.stdout.flush()
 
-def rhel_download():
-    print("")
-
-def truenas_download():
-    print("")
-
-def openfirewall():
-    os.popen("echo '%s' | sudo -S ufw allow to 0.0.0.0/0 port %s" %(password,args.p))
-    return(print("Firewall port: %s opened." %(args.p)))
-    
-def closefirewall():
-    os.popen("echo '%s' | sudo -S ufw --force delete allow %s" %(password,args.p))
-    return(print("Firewall port: %s closed." %(args.p)))
+def firewall(command):
+    if command == 'open':
+        os.popen("echo '%s' | sudo -S ufw allow to 0.0.0.0/0 port %s" %(password,args.p))
+        return(print("Firewall port: %s opened." %(args.p)))
+    elif command == 'close':
+        os.popen("echo '%s' | sudo -S ufw --force delete allow %s" %(password,args.p))
+        return(print("Firewall port: %s closed." %(args.p)))
 
 def serve():
     HOST_IP = socket.gethostbyname(socket.gethostname())
@@ -40,13 +38,12 @@ def serve():
     httpd.serve_forever()
 
 def main():
-    vyos_download()
-    rhel_download()
-    openfirewall()
+    download('vyos', 'https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova')
+    firewall('open')
     try:
         serve()
     except KeyboardInterrupt:
-        closefirewall()
+        firewall('close')
 
 def args():
     parser = argparse.ArgumentParser(prog='Image Download Automation', description="This scipt is designed to download and serve Vyos,RedHat and other Linux OS images.")

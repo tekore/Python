@@ -24,16 +24,16 @@ def download(file_name, url):
 def firewall(command):
     if command == 'open':
         os.popen("echo '%s' | sudo -S ufw allow to 0.0.0.0/0 port %s" %(password,args.p))
-        return(print("Firewall port: %s opened." %(args.p)))
+        return(print("\nFirewall port: %s opened." %(args.p)))
     elif command == 'close':
         os.popen("echo '%s' | sudo -S ufw --force delete allow %s" %(password,args.p))
-        return(print("Firewall port: %s closed." %(args.p)))
+        return(print("\nFirewall port: %s closed." %(args.p)))
 
 def serve():
     HOST_IP = socket.gethostbyname(socket.gethostname())
     httpd = HTTPServer((HOST_IP, args.p), SimpleHTTPRequestHandler)
-    os.environ['IP'] = HOST_IP
-    print("Enviroment Variable set for: %s" %(os.getenv('IP')))
+    os.environ['HOST_IP'] = HOST_IP
+    print("Enviroment Variable set for: %s" %(os.getenv('HOST_IP')))
     print("WebServer is running on http://%s:%s" %(HOST_IP,args.p))
     httpd.serve_forever()
 

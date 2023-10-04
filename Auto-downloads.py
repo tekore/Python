@@ -55,21 +55,13 @@ def rhelib(url):
             break
     image_url = json.loads(poll.content)['image_status']['upload_status']['options']['url']
     filename = os.path.basename('rhel.ova')
-    dl_path = os.path.expanduser('./') + "downloads/"
-    os.makedirs(dl_path, exist_ok=True)
-    abs_path = os.path.join(dl_path, filename)
-    with requests.get(image_url, stream=True) as r:
-        with open(abs_path, 'wb') as file:
-            total_size, chunk_size = int(r.headers.get('Content-Length')), 10240000
-            for i, chunk in enumerate(r.iter_content(chunk_size=chunk_size)):
-                c = i * chunk_size / total_size * 100
-                file.write(chunk)
-                sys.stdout.write(f"\rDownloading {filename} {round(c, 4)}%")
-                time.sleep(.1)
-                sys.stdout.flush()
+    download(image_url, filename)
 
-def download(url):
+def vyos(url):
     filename = os.path.basename('vyos.ova')
+    download(url, filename)
+
+def download(url, filename):
     dl_path = os.path.expanduser('./') + "downloads/"
     os.makedirs(dl_path, exist_ok=True)
     abs_path = os.path.join(dl_path, filename)
@@ -83,6 +75,7 @@ def download(url):
                 sys.stdout.write(f"\rDownloading {filename} {round(c, 4)}%")
                 time.sleep(.1)
                 sys.stdout.flush()
+    print("\n## Download Complete ##\n")
 
 def firewall(command):
     if command == 'open':
@@ -101,7 +94,7 @@ def serve():
 def main():
     if args.serveonly is False:
         print("\nStarting image downloads..")
-        download("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
+        vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
         rhelib("https://console.redhat.com/api/image-builder/v1/compose")
     firewall('open')
     try:
@@ -115,7 +108,7 @@ def prerun():
     elif os.access("./", os.W_OK) is False:
         sys.exit(print("%s is NOT writable! Exiting." %(os.getcwd())))
     elif args.serveonly is False and os.path.exists("./downloads") and len(os.listdir("./downloads")) > 0:
-        answer = input("\n@@@ Files in %s/downloads will be overwritten @@@\nContinue?\n" %(os.getcwd()))
+        answer = input("\n@@@ Files will be overwritten in %s/downloads @@@\nContinue?\n" %(os.getcwd()))
         if answer.lower() != "yes":
             sys.exit(print("Answer not 'yes', Exiting."))
     password = getpass.getpass('Enter the sudo password to configure the firewall:')

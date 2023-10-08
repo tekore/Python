@@ -20,7 +20,8 @@ def rhelib(url):
         "vim-enhanced",
         "yum-utils",
         "net-tools",
-        "open-vm-tools"
+        "open-vm-tools",
+        "cloud-init"
       ],
       "subscription": {
         "activation-key": '"' + str(args.activation_key) + '"',

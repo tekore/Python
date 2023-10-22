@@ -41,7 +41,7 @@ def rhelib(url):
     print("\nRequesting a Redhat access token using the supplied offline token.")
     token_request = requests.post("https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token", data=data)
     if token_request.status_code == 400:
-        return(print("\n[ERROR]: Supplied offline token is invalid, unable to use RedHat Image Builder with the supplied token.\n"))
+        return(print("\n[ERROR]: The offline token is invalid, unable to use RedHat Image Builder with the supplied token.\n"))
     print("Access token recived, Requesting the Redhat Image..")
     headers = {
     'Authorization': 'Bearer ' + json.loads(token_request.content)['access_token'],
@@ -90,14 +90,17 @@ def firewall(command):
 def serve():
     HOST_IP = socket.gethostbyname(socket.gethostname())
     httpd = HTTPServer((HOST_IP, args.p), SimpleHTTPRequestHandler)
-    print("\nWebServer is running on http://%s:%s" %(HOST_IP,args.p))
+    print("\nWebServer is running on http://%s:%s" %(HOST_IP, args.p))
     httpd.serve_forever()
 
 def main():
     if args.serveonly is False:
-        print("\nStarting image downloads..")
-        vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
-        rhelib("https://console.redhat.com/api/image-builder/v1/compose")
+        print("\nStarting Image Downloads..")
+        if args.rhelonly is False:
+            vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
+        if args.vyosonly is False:
+            rhelib("https://console.redhat.com/api/image-builder/v1/compose")
+
     firewall('open')
     try:
         serve()
@@ -112,21 +115,21 @@ def prerun():
     elif args.serveonly is False and os.path.exists("./downloads") and len(os.listdir("./downloads")) > 0:
         answer = input("\n@@@ Files will be overwritten in %s/downloads @@@\nContinue?\n" %(os.getcwd()))
         if answer.lower() != "yes":
-            sys.exit(print("Answer not 'yes', Exiting."))
+            sys.exit(print("Answer not 'yes', Aborting.."))
     password = getpass.getpass('Enter the sudo password to configure the firewall:')
     return(password)
 
 def args():
-    parser = argparse.ArgumentParser(prog='Image Download Automation', description="This scipt is designed to download Vyos and RedHat OS images and serve them over a local webserver.")
+    parser = argparse.ArgumentParser(prog='OVA Image Download Automation', description="This scipt is designed to download Vyos and RedHat OS images and serve them over a local webserver.")
     megroup = parser.add_mutually_exclusive_group()
-    parser.add_argument('--p', type=int,default=8000, help="Port for the webserver.")
-    parser.add_argument('--serveonly', action='store_true', help="Skip the image downloads, webserver only.")
+    parser.add_argument('--p', type=int,default=8000, help="Webserver port. This will default to 8000 if not set.")
+    parser.add_argument('--serveonly', action='store_true', help="Skip the image downloads, start the webserver only.")
     parser.add_argument('--offline_token', type=str, required=True, help="RedHat Image Builder Offline Token, (https://access.redhat.com/management/api).")
     parser.add_argument('--organisation', type=int, required=True, help="RedHat Profile Key Organisation Number. This can be found by clicking into the corresponding Profile Key you're using, (https://access.redhat.com/management/activation_keys).")
     parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://access.redhat.com/management/activation_keys).")
     megroup.add_argument('--vyosonly', action='store_true', help="Only download the Vyos Image.")
     megroup.add_argument('--rhelonly', action='store_true', help="Only download the RHEL Image.")
-    megroup.add_argument('--truenasonly', action='store_true', help="Only download the TrueNas Image.")
+    #megroup.add_argument('--truenasonly', action='store_true', help="Only download the TrueNas Image.")
     return(parser.parse_args())
 
 if __name__ == '__main__':

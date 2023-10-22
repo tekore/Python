@@ -100,7 +100,6 @@ def main():
             vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
         if args.vyosonly is False:
             rhelib("https://console.redhat.com/api/image-builder/v1/compose")
-
     firewall('open')
     try:
         serve()
@@ -129,7 +128,6 @@ def args():
     parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://access.redhat.com/management/activation_keys).")
     megroup.add_argument('--vyosonly', action='store_true', help="Only download the Vyos Image.")
     megroup.add_argument('--rhelonly', action='store_true', help="Only download the RHEL Image.")
-    #megroup.add_argument('--truenasonly', action='store_true', help="Only download the TrueNas Image.")
     return(parser.parse_args())
 
 if __name__ == '__main__':

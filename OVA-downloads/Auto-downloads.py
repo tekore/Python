@@ -63,6 +63,10 @@ def vyos(url):
     filename = os.path.basename('vyos.ova')
     download(url, filename)
 
+def ubuntu(url):
+    filename = os.path.basename('ubuntu.ova')
+    download(url, filename)
+
 def download(url, filename):
     dl_path = os.path.expanduser('./') + "downloads/"
     os.makedirs(dl_path, exist_ok=True)
@@ -96,10 +100,12 @@ def serve():
 def main():
     if args.serveonly is False:
         print("\nStarting Image Downloads..")
-        if args.rhelonly is False:
+        if args.rhelonly is False and args.ubuntuonly is False:
             vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
-        if args.vyosonly is False:
+        if args.vyosonly is False and args.ubuntuonly is False:
             rhelib("https://console.redhat.com/api/image-builder/v1/compose")
+        if args.vyosonly is False and args.rhelonly is False:
+            ubuntu("https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.ova")
     firewall('open')
     try:
         serve()
@@ -123,11 +129,12 @@ def args():
     megroup = parser.add_mutually_exclusive_group()
     parser.add_argument('--p', type=int,default=8000, help="Webserver port. This will default to 8000 if not set.")
     parser.add_argument('--serveonly', action='store_true', help="Skip the image downloads, start the webserver only.")
-    parser.add_argument('--offline_token', type=str, required=True, help="RedHat Image Builder Offline Token, (https://access.redhat.com/management/api).")
-    parser.add_argument('--organisation', type=int, required=True, help="RedHat Profile Key Organisation Number. This can be found by clicking into the corresponding Profile Key you're using, (https://access.redhat.com/management/activation_keys).")
-    parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://access.redhat.com/management/activation_keys).")
+    parser.add_argument('--organisation', type=int, required=True, help="RedHat organisation ID. This can be found under the 'Activation Keys' heading, (https://console.redhat.com/insights/connector/activation-keys).")
+    parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://console.redhat.com/insights/connector/activation-keys).")
+    parser.add_argument('--offline-token', type=str, required=True, help="RedHat Image Builder Offline Token, (https://access.redhat.com/management/api).")
     megroup.add_argument('--vyosonly', action='store_true', help="Only download the Vyos Image.")
     megroup.add_argument('--rhelonly', action='store_true', help="Only download the RHEL Image.")
+    megroup.add_argument('--ubuntuonly', action='store_true', help="Only download the Ubuntu Image.")
     return(parser.parse_args())
 
 if __name__ == '__main__':

@@ -100,12 +100,12 @@ def serve():
 def main():
     if args.serveonly is False:
         print("\nStarting Image Downloads..")
-        if args.rhelonly is False and args.ubuntuonly is False:
+        if args.vyos is True:
             vyos("https://legacy-lts-images.vyos.io/1.2.9-S1/vyos-1.2.9-S1-cloud-init-vmware.ova")
-        if args.vyosonly is False and args.ubuntuonly is False:
-            rhelib("https://console.redhat.com/api/image-builder/v1/compose")
-        if args.vyosonly is False and args.rhelonly is False:
+        if args.ubuntu is True:
             ubuntu("https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.ova")
+        if args.rhel is True:
+            rhelib("https://console.redhat.com/api/image-builder/v1/compose")
     firewall('open')
     try:
         serve()

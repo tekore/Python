@@ -35,18 +35,17 @@ Used to spawn processes on seperate threads as deamons, limit the number of thre
 - Queue
 
 Used to enable thread safe queueing of tasks.
-### ssh.py
-Cluster SSH created in python3
-
+### ova-downloader.py
 Notable libraries used:
-- Subprocess
-- Pty
-- Threading
-- Queue
+- socket
+Used to get the host IP.
 
-Future Improvments:
+- requests
+User the communicate with API's and download required files.
 
-- Use the multiprocessing library alongside the threading library to take advantage of multicore systems
+- http.server
+Used to host files on a simple webserver.
+
 
 ## Maintainers
 [@Tekore](https://github.com/tekore)

@@ -113,28 +113,33 @@ def main():
         firewall('close')
 
 def prerun():
-    if os.path.exists("/usr/sbin/ufw") is False:
+    if not any([args.vyos, args.ubuntu, args.rhel, args.serveonly]):
+        sys.exit(print("\nOVA Image Downloader: [ERROR]: At least one of the following flags is required '--vyos' '--ubuntu' '--rhel'"))
+    elif args.rhel is True and not args.RHEL:
+        sys.exit(print("\nOVA Image Downloader: [INFO]: To download the RedHat OVA Image please use the 'RHEL' flag along with the required flags '--organisation', '--activation_key', '--offline_token'. (Example: python3 Auto-downloads.py --rhel RHEL --organisation 12335678 --activation-key redhat-server --offline-token eyJhbGciOi....)"))
+    elif os.path.exists("/usr/sbin/ufw") is False:
         sys.exit(print("ufw NOT installed! Exiting."))
     elif os.access("./", os.W_OK) is False:
         sys.exit(print("%s is NOT writable! Exiting." %(os.getcwd())))
     elif args.serveonly is False and os.path.exists("./downloads") and len(os.listdir("./downloads")) > 0:
         answer = input("\n@@@ Files will be overwritten in %s/downloads @@@\nContinue?\n" %(os.getcwd()))
         if answer.lower() != "yes":
-            sys.exit(print("Answer not 'yes', Aborting.."))
+            sys.exit(print("Answer was not 'yes', Aborting.."))
     password = getpass.getpass('Enter the sudo password to configure the firewall:')
     return(password)
 
 def args():
-    parser = argparse.ArgumentParser(prog='OVA Image Download Automation', description="This scipt is designed to download Vyos and RedHat OS images and serve them over a local webserver.")
-    megroup = parser.add_mutually_exclusive_group()
+    parser = argparse.ArgumentParser(prog='OVA Image Downloader', description="This scipt is designed to download Vyos, Ubuntu and RedHat OVA images and serve them on a local webserver.")
     parser.add_argument('--p', type=int,default=8000, help="Webserver port. This will default to 8000 if not set.")
     parser.add_argument('--serveonly', action='store_true', help="Skip the image downloads, start the webserver only.")
-    parser.add_argument('--organisation', type=int, required=True, help="RedHat organisation ID. This can be found under the 'Activation Keys' heading, (https://console.redhat.com/insights/connector/activation-keys).")
-    parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://console.redhat.com/insights/connector/activation-keys).")
-    parser.add_argument('--offline-token', type=str, required=True, help="RedHat Image Builder Offline Token, (https://access.redhat.com/management/api).")
-    megroup.add_argument('--vyosonly', action='store_true', help="Only download the Vyos Image.")
-    megroup.add_argument('--rhelonly', action='store_true', help="Only download the RHEL Image.")
-    megroup.add_argument('--ubuntuonly', action='store_true', help="Only download the Ubuntu Image.")
+    subparsers = parser.add_subparsers(dest="RHEL", help='Parser for the RHEL flag')
+    rhel_parser = subparsers.add_parser('RHEL', help="RHEL data for the image builder")
+    parser.add_argument('--vyos', action='store_true', help="Download the VyOS OVA Image.")
+    parser.add_argument('--ubuntu', action='store_true', help="Download the Ubuntu OVA Image.")
+    parser.add_argument('--rhel', action='store_true', help="Download the RHEL9 OVA Image.")
+    rhel_parser.add_argument('--organisation', type=int, required=True, help="RedHat organisation ID. This can be found under the 'Activation Keys' heading, (https://console.redhat.com/insights/connector/activation-keys).")
+    rhel_parser.add_argument('--activation-key', type=str, required=True, help="RedHat Profile Key, (https://console.redhat.com/insights/connector/activation-keys).")
+    rhel_parser.add_argument('--offline-token', type=str, required=True, help="RedHat Image Builder Offline Token, (https://access.redhat.com/management/api).")
     return(parser.parse_args())
 
 if __name__ == '__main__':
